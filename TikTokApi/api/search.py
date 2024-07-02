@@ -42,6 +42,14 @@ class Search:
             yield user
 
     @staticmethod
+    @staticmethod
+    async def general(search_term, count=100, cursor=0, **kwargs) -> Iterator[User]:
+        async for user in Search.search_type(
+            search_term, "general", count=100, cursor=cursor, **kwargs
+        ):
+            yield user
+
+    @staticmethod
     async def search_type(
         search_term, obj_type, count=10, cursor=0, **kwargs
     ) -> Iterator:
@@ -73,7 +81,9 @@ class Search:
         while found < count:
             params = {
                 "keyword": search_term,
+                "count": 12,
                 "cursor": cursor,
+                "app_language": "ja-JP",
                 "from_page": "search",
                 "web_search_code": """{"tiktok":{"client_params_x":{"search_engine":{"ies_mt_user_live_video_card_use_libra":1,"mt_search_general_user_live_card":1}},"search_server":{}}}""",
             }
@@ -100,6 +110,41 @@ class Search:
                     )
                     found += 1
 
+            elif obj_type == "general":
+                for user in resp.get("data", []):
+                    if user['type'] == 1:
+                        # sec_uid = user.get("item").get("author").get("secUid")
+                        # uid = user.get("item").get("author").get("id")
+                        # username = user.get("item").get("author").get("uniqueId")
+                        # yield Search.parent.user(
+                        #     sec_uid=sec_uid, user_id=uid, username=username, data=user.get("item").get("author")
+                        #     # sec_uid=sec_uid, user_id=uid, username=username
+                        # )
+                        yield Search.parent.video(
+                            # sec_uid=sec_uid, user_id=uid, username=username, data=user
+                            data=user.get("item")
+                        )
+                    found += 1
+
+            elif obj_type == "item":
+                # print('item')
+                for user in resp.get("item_list", []):
+                    print(user.get('id'))
+                    # print(user.get('desc'))
+                    # sec_uid = user.get("item").get("author").get("secUid")
+                    # uid = user.get("item").get("author").get("id")
+                    # username = user.get("item").get("author").get("uniqueId")
+                    # # yield Search.parent.user(
+                    # #     sec_uid=sec_uid, user_id=uid, username=username, data=user.get("item").get("author")
+                    # #     # sec_uid=sec_uid, user_id=uid, username=username
+                    # # )
+                    # yield Search.parent.video(
+                    #     # sec_uid=sec_uid, user_id=uid, username=username, data=user
+                    #     data=user.get("item")
+                    # )
+                    found += 1
+
+            # print(resp)            
             if not resp.get("has_more", False):
                 return
 
