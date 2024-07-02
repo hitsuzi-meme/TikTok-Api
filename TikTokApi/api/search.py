@@ -138,10 +138,9 @@ class Search:
                     # #     sec_uid=sec_uid, user_id=uid, username=username, data=user.get("item").get("author")
                     # #     # sec_uid=sec_uid, user_id=uid, username=username
                     # # )
-                    # yield Search.parent.video(
-                    #     # sec_uid=sec_uid, user_id=uid, username=username, data=user
-                    #     data=user.get("item")
-                    # )
+                    yield Search.parent.video(
+                        data=user.get("item")
+                    )
                     found += 1
 
             # print(resp)            
